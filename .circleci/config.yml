@@ -333,9 +333,9 @@ jobs:
       - destroy-infra
 
 workflows:
-  # frontend:
-  #   jobs:
-  #     - build-frontend:
+  frontend:
+    jobs:
+      - build-frontend:
   #         filters:
   #           branches:
   #             ignore: master
