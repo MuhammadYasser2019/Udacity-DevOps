@@ -354,21 +354,21 @@ jobs:
 
 workflows:
   build:
-  #   jobs:
+    jobs:
       # - build
-  # #         filters:
-  # #           branches:
-  #             # ignore: master
-  #     - test:
-  #         requires: [build]
-  #         filters:
-  #           branches:
-  #             ignore: master
+      #     filters:
+      #       branches:
+      #         ignore: master
+      # - test:
+      #     requires: [build]
+      #     filters:
+      #       branches:
+      #         ignore: master
       - docker-build
-  #         requires: [build-frontend]
-  #         filters:
-  #           branches:
-  #             ignore: master
+          # requires: [build-frontend]
+          # filters:
+          #   branches:
+          #     ignore: master
   # backend:
   #   jobs:
   #     - build-backend:
