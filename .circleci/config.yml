@@ -61,7 +61,7 @@ parameters:
 jobs:
   build-frontend:
     docker:
-      - image: ruby/ruby:2.4.1
+      - image: ruby:2.4.1
     steps:
       - checkout
       - restore_cache:
