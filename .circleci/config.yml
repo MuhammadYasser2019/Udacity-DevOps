@@ -107,23 +107,23 @@ jobs:
           paths: [node_modules]
           key: build
 
-  analyze-frontend:
+  test:
     docker:
-      - image: circleci/node:13.8.0
+      - image: << pipeline.parameters.circleci_image >>
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [build]
       - run:
-          name: Installl front-end dependencies
+          name: Check for syntax errors
           command: |
-            cd frontend
-            npm install
-      - run:
-          name: Analyze front-end
-          command: |
-            cd frontend
-            npm audit fix --audit-level=critical --force
+            gem install roodi
+            roodi config/application.rb
+      # - run:
+      #     name: Analyze front-end
+      #     command: |
+      #       cd frontend
+      #       npm audit fix --audit-level=critical --force
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -339,14 +339,14 @@ jobs:
       - destroy-infra
 
 workflows:
-  frontend:
+  build:
     jobs:
       - build
   #         filters:
   #           branches:
-  #             ignore: master
-  #     - test-frontend:
-  #         requires: [build-frontend]
+              # ignore: master
+      - test:
+          requires: [build]
   #         filters:
   #           branches:
   #             ignore: master
