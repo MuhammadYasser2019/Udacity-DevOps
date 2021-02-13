@@ -335,7 +335,7 @@ jobs:
 workflows:
   frontend:
     jobs:
-      - build-frontend:
+      - build-frontend
   #         filters:
   #           branches:
   #             ignore: master
