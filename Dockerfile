@@ -1,6 +1,14 @@
-FROM image-registry.openshift-image-registry.svc:5000/openshift/ruby:2.4.1
+###########
+# BUILDER #
+###########
+
+
+FROM muhammadyasser/timestack-builder:latest as builder
+
 
 RUN mkdir /app
+
+
 
 # # adding source code
 COPY . /app/

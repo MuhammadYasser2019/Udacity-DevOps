@@ -118,12 +118,26 @@ jobs:
           name: Check for syntax errors
           command: |
             gem install roodi
+            ruby -c config/application.rb
             roodi config/application.rb
-      # - run:
+            echo "There is no syntax error, Great!"
+      # - run
       #     name: Analyze front-end
       #     command: |
       #       cd frontend
       #       npm audit fix --audit-level=critical --force
+  docker-build:
+    machine: true
+    steps:
+      - checkout
+      # start proprietary DB using private Docker image
+      # with credentials stored in the UI
+      # - run: |
+      #     echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      #     docker run -d --name db company/proprietary-db:1.2.3
+
+      # build the application image
+      - run: docker build -t company/app:$CIRCLE_BRANCH .
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -339,18 +353,18 @@ jobs:
       - destroy-infra
 
 workflows:
-  build:
-    jobs:
-      - build
-  #         filters:
-  #           branches:
-              # ignore: master
-      - test:
-          requires: [build]
+  # build:
+  #   jobs:
+      # - build
+  # #         filters:
+  # #           branches:
+  #             # ignore: master
+  #     - test:
+  #         requires: [build]
   #         filters:
   #           branches:
   #             ignore: master
-  #     - analyze-frontend:
+      - docker-build
   #         requires: [build-frontend]
   #         filters:
   #           branches:
