@@ -353,7 +353,7 @@ jobs:
       - destroy-infra
 
 workflows:
-  # build:
+  build:
   #   jobs:
       # - build
   # #         filters:
