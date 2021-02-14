@@ -147,8 +147,9 @@ jobs:
              chmod -R +x .
              bundle install
              echo $DATABASE_USER
-             bin/rails db:migrate RAILS_ENV=development
-             bin/rails db:seed
+            #  bin/rails db:migrate RAILS_ENV=development
+            #  bin/rails db:seed
+             bin/rake db:rollback STEP=1
              
       # - run:
       #     name: Run database seed
