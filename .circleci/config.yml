@@ -137,7 +137,7 @@ jobs:
 
   migrations:
     docker:
-      - image: muhammadyasser/timestack-builder
+      - image: muhammadyasser/timestack-builder:latest
     steps:
       - checkout
       - run:
@@ -145,11 +145,12 @@ jobs:
           command: |
              ls -l
              chmod -R +x /app
-             /app/bin/rails db:migrate RAILS_ENV=development
+             pwd
+             bin/rails db:migrate RAILS_ENV=development
       - run:
           name: Run database seed
           command: |
-             /app/bin/rails db:seed
+             bin/rails db:seed
 
   test-backend:
     docker:
@@ -357,15 +358,15 @@ workflows:
       #     filters:
       #       branches:
       #         ignore: master
-      - docker-build
+      # - docker-build
           # requires: [build-frontend]
           # filters:
           #   branches:
           #     ignore: master
-      - migrations:
-          requires:
-            - "docker-build"
-            
+      - migrations
+          # requires:
+          #   - "docker-build"
+
   # backend:
   #   jobs:
   #     - build-backend:
