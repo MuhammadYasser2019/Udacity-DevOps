@@ -143,9 +143,9 @@ jobs:
       - run:
           name: Run migrations
           command: |
-             ls -l /app
              cp -r /app/node_modules .
              chmod -R +x .
+             bundle install
              bin/rails db:migrate RAILS_ENV=development
              bin/rails db:seed
              
