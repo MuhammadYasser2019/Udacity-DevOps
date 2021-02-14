@@ -141,19 +141,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Back-end install dependencies
+          name: Run migrations
           command: |
              ls -l
-             npm install
+             chmod -R +x /app
+             /app/bin/rails db:migrate RAILS_ENV=development
       - run:
-          name: Back-end build
+          name: Run database seed
           command: |
-             cd backend
-             npm run build
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-build
-
+             /app/bin/rails db:seed
 
   test-backend:
     docker:
@@ -349,9 +345,9 @@ jobs:
       - revert-migrations
       - destroy-infra
 
-# workflows:
-#   build:
-#     jobs:
+workflows:
+  build:
+    jobs:
       # - build
       #     filters:
       #       branches:
@@ -361,11 +357,15 @@ jobs:
       #     filters:
       #       branches:
       #         ignore: master
-      # - docker-build
+      - docker-build
           # requires: [build-frontend]
           # filters:
           #   branches:
           #     ignore: master
+      - migrations:
+          requires:
+            - "docker-build"
+            
   # backend:
   #   jobs:
   #     - build-backend:
