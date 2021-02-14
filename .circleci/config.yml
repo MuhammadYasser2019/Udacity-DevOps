@@ -143,14 +143,16 @@ jobs:
       - run:
           name: Run migrations
           command: |
-             ls -l
+             mv . /app
              chmod -R +x /app
-             pwd
+             cd /app
+             ls -l
              bin/rails db:migrate RAILS_ENV=development
-      - run:
-          name: Run database seed
-          command: |
              bin/rails db:seed
+      # - run:
+      #     name: Run database seed
+      #     command: |
+      #        bin/rails db:seed
 
   test-backend:
     docker:
