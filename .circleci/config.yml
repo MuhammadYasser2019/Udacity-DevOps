@@ -143,10 +143,11 @@ jobs:
       - run:
           name: Run migrations
           command: |
-             chmod -R +x .
              ls -l /app
-            #  bin/rails db:migrate RAILS_ENV=development
-            #  bin/rails db:seed
+             cp -r /app/node_modules .
+             chmod -R +x .
+             bin/rails db:migrate RAILS_ENV=development
+             bin/rails db:seed
              
       # - run:
       #     name: Run database seed
