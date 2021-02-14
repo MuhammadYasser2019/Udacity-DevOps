@@ -4,7 +4,8 @@ defaults: &defaults
   username: <%= ENV['DATABASE_USER'] %> 
   password: <%= ENV['DATABASE_PASS'] %> 
   pool: 5
-  host: udacity.coa3nv0zxmy6.us-west-2.rds.amazonaws.com
+  host: udacity-1.coa3nv0zxmy6.us-west-2.rds.amazonaws.com
+  
 
 ### ALTER USER 'yasser'@'%' IDENTIFIED WITH mysql_native_password BY 'rsi1111'; 
 test: &test
