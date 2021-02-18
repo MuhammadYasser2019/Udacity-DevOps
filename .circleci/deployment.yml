@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: time-stack-prod
+  labels:
+    app: time-stack-chain
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+      # pre:
+      #   failurePolicy: Abort
+      #   execNewPod:
+      #     command:
+      #       - /app/bin/rails
+      #       - 'db:migrate'
+      #       - RAILS_ENV=development
+      #     containerName: time-stack-chain
+      # post:
+      #   failurePolicy: Abort
+      #   execNewPod:
+      #     command:
+      #       - /app/bin/rails
+      #       - 'db:seed'
+      #     containerName: time-stack-chain
+  replicas: 1
+  selector:
+    matchLabels:
+      app: time-stack-chain
+  template:
+    metadata:
+      labels:
+        app: time-stack-chain
+    spec:
+      containers:
+      - name: time-stack-chain
+        image: muhammadyasser/ruby-udacity:latest
+        lifecycle:
+          # preStop:
+          #   exec:
+          #     command: ["/bin/sh", "-c", "/app/bin/rails db:migrate RAILS_ENV=development"]
+          #       - /app/bin/rails
+          #       - 'db:migrate'
+          #       - RAILS_ENV=development
+          #     containerName: time-stack-chain
+          # postStart:
+          #   exec:
+          #     command:
+          #       - /app/bin/rails
+          #       - 'db:seed db:migrate'
+          #       - RAILS_ENV=development
+        ports:
+        - containerPort: 3000
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: time-stack-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 3000
+  selector:
+    app: time-stack-chain
+  type: LoadBalancer

@@ -170,28 +170,76 @@ jobs:
             apk add --no-cache openssh-client
             pip3 install awscli
       - run:
+          name: Install K8s dependencies
+          command: |
+            curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/aws-iam-authenticator
+            chmod +x ./aws-iam-authenticator
+            mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin
+            echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+            aws-iam-authenticator help
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            mv /tmp/eksctl /usr/local/bin
+            eksctl version
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl version --client
+      - run:
           name: aws provisioning
           command: |
-              AWS_VALIDATION=$(aws cloudformation list-exports --query "Exports[?Name=='ENV'].Value" --output text)
-              if [[ "${AWS_VALIDATION}" != "demo" ]] 
-              then 
-              aws cloudformation deploy --template-file .circleci/files/backend.yml --stack-name demo --region us-west-2 --parameter-overrides EnvironmentName=demo
-              fi
-  analyze-backend:
+            AWS_VALIDATION=$(aws cloudformation list-exports --query "Exports[?Name=='eksctl-${EKS_CLUSTER_NAME}-cluster::ARN'].Value" --output text)
+            if [[ "${AWS_VALIDATION}" = "None" ]] 
+            then 
+              eksctl create cluster --name udacity \
+              --nodegroup-name workers \
+              --node-type t2.medium \
+              --nodes 2 \
+              --nodes-min 1 \
+              --nodes-max 3 \
+              --node-ami auto \
+              --region us-west-2 
+            fi
+            sleep 2m
+  deployment:
     docker:
-      - image: circleci/node:13.8.0
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - run:
-          name: Back-end install dependencies
+          name: install aws cli
           command: |
-             cd backend
-             npm install
+            apk add --no-cache curl
+            apk add --no-cache --upgrade bash
+            apk add --no-cache --update ansible
+            apk add --no-cache openssh-client
+            pip3 install awscli
       - run:
-          name: Back-end code analyze
+          name: Install K8s dependencies
           command: |
-             cd backend
-             npm audit fix --audit-level=critical --force
+            curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/aws-iam-authenticator
+            chmod +x ./aws-iam-authenticator
+            mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin
+            echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+            aws-iam-authenticator help
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            mv /tmp/eksctl /usr/local/bin
+            eksctl version
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl version --client
+            AWS_VALIDATION=$(aws cloudformation list-exports --query "Exports[?Name=='eksctl-${EKS_CLUSTER_NAME}-cluster::ARN'].Value" --output text)
+            aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME}
+            kubectl config use-context ${AWS_VALIDATION}
+      - run: 
+          name: deploy and rollout
+          command: |
+            kubectl get pods
+            kubectl get deployments
+            kubectl apply -f deployment.yml
+            kubectl rollout restart deployments/time-stack-prod
+            kubectl get svc
+            kubectl get services -o wide
+            URLS=$(kubectl get services -o wide)
+            echo $URLS
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
@@ -375,7 +423,7 @@ workflows:
       # - migrations
           # requires:
           #   - "docker-build"
-      - test-circleci
+      # - test-circleci
 
   # backend:
   #   jobs:

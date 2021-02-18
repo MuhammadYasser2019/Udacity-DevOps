@@ -1,8 +1,8 @@
 defaults: &defaults
   adapter: mysql2
   encoding: utf8
-  username: <%= ENV['DATABASE_USER'] %> 
-  password: <%= ENV['DATABASE_PASS'] %> 
+  username: admin 
+  password: rsi11112222
   pool: 5
   host: udacity-1.coa3nv0zxmy6.us-west-2.rds.amazonaws.com
   
@@ -14,7 +14,7 @@ test: &test
 
 development:
   <<: *defaults
-  database: <%= ENV['DATABASE_NAME'] %> 
+  database: development
 
 cucumber:
   <<: *test

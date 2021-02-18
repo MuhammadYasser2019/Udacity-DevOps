@@ -47,9 +47,12 @@ WORKDIR /app
 
 COPY . .
 
+### fix permission ###
+RUN chmod -R +x bin
+
 # # # run db migrations and run the app and expose the port
 # # CMD bin/rails db:migrate RAILS_ENV=development && bundle exec "rackup -P /tmp/rack.pid --host 0.0.0.0 --port 8080"
-# CMD bin/rails db:migrate RAILS_ENV=$RAILS_ENV && bin/rails db:seed && bundle exec "rackup -P /tmp/rack.pid --host 0.0.0.0 --port 8080"
-CMD bundle exec "rackup -P /tmp/rack.pid --host 0.0.0.0 --port 8080"
+CMD bin/rails db:migrate RAILS_ENV=development && bin/rails db:seed && bundle exec "rackup -P /tmp/rack.pid --host 0.0.0.0 --port 3000"
+# CMD bundle exec "rackup -P /tmp/rack.pid --host 0.0.0.0 --port 8080"
 
 
