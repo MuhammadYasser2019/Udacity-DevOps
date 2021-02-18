@@ -202,7 +202,7 @@ jobs:
       - run: 
           name: verify new deployment success 
           command: |
-            URL=$(kubectl get svc simple-web-app -o jsonpath="{.status.loadBalancer.ingress[*].hostname}")
+            URL=$(kubectl get svc time-stack-service -o jsonpath="{.status.loadBalancer.ingress[*].hostname}")
             curl ${URL}:8080
 
 workflows:
@@ -212,7 +212,7 @@ workflows:
       #     filters:
       #       branches:
       #         ignore: master
-      # - test:
+      - lint
       #     requires: [build]
       #     filters:
       #       branches:

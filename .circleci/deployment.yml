@@ -22,20 +22,6 @@ spec:
       containers:
       - name: time-stack-chain
         image: muhammadyasser/ruby-udacity:latest
-        lifecycle:
-          # preStop:
-          #   exec:
-          #     command: ["/bin/sh", "-c", "/app/bin/rails db:migrate RAILS_ENV=development"]
-          #       - /app/bin/rails
-          #       - 'db:migrate'
-          #       - RAILS_ENV=development
-          #     containerName: time-stack-chain
-          # postStart:
-          #   exec:
-          #     command:
-          #       - /app/bin/rails
-          #       - 'db:seed db:migrate'
-          #       - RAILS_ENV=development
         ports:
         - containerPort: 3000
 ---
