@@ -1,37 +1,117 @@
+# Description: >
+#   UdaPeople backend stack.
+
+# Parameters:
+#   ID:
+#     Description: Unique identifier.
+#     Type: String
+
+# Resources:
+#   InstanceSecurityGroup:
+#     Type: AWS::EC2::SecurityGroup
+#     Properties:
+#       GroupName: !Sub UdaPeople-${ID}
+#       GroupDescription: Allow port 22 and port 3030.
+#       SecurityGroupIngress:
+#         - IpProtocol: tcp
+#           FromPort: 22
+#           ToPort: 22
+#           CidrIp: 0.0.0.0/0
+#         - IpProtocol: tcp
+#           FromPort: 3030
+#           ToPort: 3030
+#           CidrIp: 0.0.0.0/0
+
+#   EC2Instance:
+#     Type: AWS::EC2::Instance
+#     Properties:
+#       InstanceType: t2.micro
+#       SecurityGroups:
+#         - Ref: InstanceSecurityGroup
+#       KeyName: udacity # If you use another key pair name, you should change this value to match.
+#       # If this ami id is not available for you, you can find another (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)
+#       # Ubuntu 18 or higher works fine
+#       ImageId: ami-068663a3c619dd892 
+#       Tags:
+#         - Key: Name
+#           Value: !Sub backend-${ID}
+
 Description: >
-  UdaPeople backend stack.
+    Muhammad Yasser / Udacity Nanodegree
+    This is a template for creating a VPC
 
-Parameters:
-  ID:
-    Description: Unique identifier.
-    Type: String
+Parameters: 
 
+    EnvironmentName: 
+        Description: A name that will be listed with any created Resources
+        Type: String
+
+  
 Resources:
-  InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: !Sub UdaPeople-${ID}
-      GroupDescription: Allow port 22 and port 3030.
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 3030
-          ToPort: 3030
-          CidrIp: 0.0.0.0/0
 
-  EC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: t2.micro
-      SecurityGroups:
-        - Ref: InstanceSecurityGroup
-      KeyName: udacity # If you use another key pair name, you should change this value to match.
-      # If this ami id is not available for you, you can find another (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)
-      # Ubuntu 18 or higher works fine
-      ImageId: ami-068663a3c619dd892 
-      Tags:
-        - Key: Name
-          Value: !Sub backend-${ID}
+  Ec2Instance:
+
+      Type: AWS::EC2::Instance
+      Properties: 
+        AdditionalInfo: onTheFlyInstance
+        # Affinity: String
+        # AvailabilityZone: String
+        # BlockDeviceMappings: 
+        #   - BlockDeviceMapping
+        # CpuOptions: 
+        #   CpuOptions
+        # CreditSpecification: 
+        #   CreditSpecification
+        # DisableApiTermination: Boolean
+        # EbsOptimized: Boolean
+        # ElasticGpuSpecifications: 
+        #   - ElasticGpuSpecification
+        # ElasticInferenceAccelerators: 
+        #   - ElasticInferenceAccelerator
+        # EnclaveOptions: 
+        #   EnclaveOptions
+        # HibernationOptions: 
+        #   HibernationOptions
+        # HostId: String
+        # HostResourceGroupArn: String
+        # IamInstanceProfile: String
+        ImageId: ami-0ac73f33a1888c64a 
+        # InstanceInitiatedShutdownBehavior: String
+        InstanceType: t2.micro
+        # Ipv6AddressCount: Integer
+        # Ipv6Addresses: 
+        #   - InstanceIpv6Address
+        # KernelId: String
+        KeyName: Udacity-us-west-2
+        # LaunchTemplate: 
+        #   LaunchTemplateSpecification
+        # LicenseSpecifications: 
+        #   - LicenseSpecification
+        # Monitoring: Boolean
+        # NetworkInterfaces: 
+        # - AssociatePublicIpAddress: "true"        
+        #   DeviceIndex: "0"
+        # PlacementGroupName: String
+        # PrivateIpAddress: String
+        # RamdiskId: String
+        SecurityGroupIds: 
+          - sg-0354ce653b364e3b4
+        # SecurityGroups: 
+        #   - String
+        # SourceDestCheck: Boolean
+        # SsmAssociations: 
+        #   - SsmAssociation
+        # SubnetId: String
+        Tags:
+            - Key: Name 
+              Value: Ec2ForTest 
+        # Tenancy: String
+        # UserData: String
+        # Volumes: 
+        #   - Volume
+Outputs:
+  WorkflowID:
+    Value: !Sub ${EnvironmentName}
+    Description: URL for website hosted on S3
+    Export:
+      Name: ENV
