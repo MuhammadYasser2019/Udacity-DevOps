@@ -23,27 +23,6 @@ jobs:
       - image: << pipeline.parameters.circleci_image >>
     steps:
       - checkout
-      - restore_cache:
-          keys: [build]
-      - run:
-          name: install dependencies for front-end
-          command: |
-            ls -l
-            pwd
-      - run:
-          name: Build front-end
-          command: |
-            cd frontend
-            npm run build
-      - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-build
-
-  build:
-    docker:
-      - image: << pipeline.parameters.circleci_image >>
-    steps:
-      - checkout
       - run:
           name: Installl dependencies
           command: |
