@@ -177,28 +177,28 @@ jobs:
 workflows:
   build:
     jobs:
-      - build
-      #     filters:
-      #       branches:
-      #         ignore: master
-      - lint:
-          requires: [build]
-      #     filters:
-      #       branches:
-      #         ignore: master
-      - docker-build:
-          requires: [lint]
-          # filters:
-          #   branches:
-          #     ignore: master
-      - migration:
-          requires:
-            - "docker-build"
-      - deploy-k8s-cluster:
-          requires:
-            - "docker-build"
-      - app-deployment:
-          requires:
-            - "deploy-k8s-cluster"
+      # - build
+      # #     filters:
+      # #       branches:
+      # #         ignore: master
+      # - lint:
+      #     requires: [build]
+      # #     filters:
+      # #       branches:
+      # #         ignore: master
+      # - docker-build:
+      #     requires: [lint]
+      #     # filters:
+      #     #   branches:
+      #     #     ignore: master
+      # - migration:
+      #     requires:
+      #       - "docker-build"
+      # - deploy-k8s-cluster:
+      #     requires:
+      #       - "docker-build"
+      - app-deployment
+      #     requires:
+      #       - "deploy-k8s-cluster"
 
 
