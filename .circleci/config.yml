@@ -79,15 +79,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Run DB migrations
+          name: Run migrations
           command: |
              cp -r /app/node_modules .
              chmod -R +x bin
              bundle install
              echo $DATABASE_USER
-            #  bin/rake db:rollback STEP=1
-             bin/rails db:migrate RAILS_ENV=development
-             bin/rails db:seed
+             bin/rails db:migrate db:seed RAILS_ENV=development
 
   deploy-k8s-cluster:
     docker:
