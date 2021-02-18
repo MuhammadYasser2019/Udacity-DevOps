@@ -10,21 +10,6 @@ spec:
     rollingUpdate:
       maxUnavailable: 25%
       maxSurge: 25%
-      # pre:
-      #   failurePolicy: Abort
-      #   execNewPod:
-      #     command:
-      #       - /app/bin/rails
-      #       - 'db:migrate'
-      #       - RAILS_ENV=development
-      #     containerName: time-stack-chain
-      # post:
-      #   failurePolicy: Abort
-      #   execNewPod:
-      #     command:
-      #       - /app/bin/rails
-      #       - 'db:seed'
-      #     containerName: time-stack-chain
   replicas: 1
   selector:
     matchLabels:
