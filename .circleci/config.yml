@@ -10,7 +10,7 @@ commands:
             bin/rake db:rollback STEP=1
           when: on_fail
 parameters:
-  circleci_image:
+  ruby_image:
     type: string
     default: ruby:2.4.1
   py_alp_image:
@@ -20,7 +20,7 @@ parameters:
 jobs:
   build:
     docker:
-      - image: << pipeline.parameters.circleci_image >>
+      - image: << pipeline.parameters.ruby_image >>
     steps:
       - checkout
       - run:
@@ -47,7 +47,7 @@ jobs:
 
   lint:
     docker:
-      - image: << pipeline.parameters.circleci_image >>
+      - image: << pipeline.parameters.ruby_image >>
     steps:
       - checkout
       - restore_cache:
@@ -73,31 +73,25 @@ jobs:
       - run: docker images
       - run: docker push muhammadyasser/ruby-udacity:latest
 
-  migrations:
+  migration:
     docker:
       - image: muhammadyasser/timestack-builder:latest
     steps:
       - checkout
       - run:
-          name: Run migrations
+          name: Run DB migrations
           command: |
              cp -r /app/node_modules .
              chmod -R +x bin
              bundle install
              echo $DATABASE_USER
             #  bin/rake db:rollback STEP=1
-            #  bin/rails db:migrate RAILS_ENV=development
-            #  bin/rails db:seed
-             
-      # - run:
-      #     name: Run database seed
-      #     command: |
-      #        bin/rails db:seed
+             bin/rails db:migrate RAILS_ENV=development
+             bin/rails db:seed
 
-
-  test-circleci:
+  deploy-k8s-cluster:
     docker:
-      - image: << pipeline.parameters.circleci_image >>
+      - image: << pipeline.parameters.py_alp_image >>
     steps:
       - checkout
       - run:
@@ -123,7 +117,7 @@ jobs:
             install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
             kubectl version --client
       - run:
-          name: aws provisioning
+          name: K8s cluster provisioning
           command: |
             AWS_VALIDATION=$(aws cloudformation list-exports --query "Exports[?Name=='eksctl-${EKS_CLUSTER_NAME}-cluster::ARN'].Value" --output text)
             if [[ "${AWS_VALIDATION}" = "None" ]] 
@@ -138,9 +132,9 @@ jobs:
               --region us-west-2 
             fi
             sleep 2m
-  deployment:
+  app-deployment:
     docker:
-      - image: << pipeline.parameters.circleci_image >>
+      - image: << pipeline.parameters.py_alp_image >>
     steps:
       - checkout
       - run:
@@ -175,34 +169,39 @@ jobs:
             kubectl apply -f deployment.yml
             kubectl rollout restart deployments/time-stack-prod
             kubectl get svc
-            kubectl get services -o wide
-            URLS=$(kubectl get services -o wide)
-            echo $URLS
+            sleep 1m
       - run: 
           name: verify new deployment success 
           command: |
+            kubectl rollout status deployments/time-stack-prod
             URL=$(kubectl get svc time-stack-service -o jsonpath="{.status.loadBalancer.ingress[*].hostname}")
-            curl ${URL}:8080
+            curl -I ${URL}:8080
 
 workflows:
   build:
     jobs:
-      # - build
+      - build
       #     filters:
       #       branches:
       #         ignore: master
-      - lint
-      #     requires: [build]
+      - lint:
+          requires: [build]
       #     filters:
       #       branches:
       #         ignore: master
-      # - docker-build
-          # requires: [build-frontend]
+      - docker-build:
+          requires: [lint]
           # filters:
           #   branches:
           #     ignore: master
-      # - migrations
-          # requires:
-          #   - "docker-build"
-      # - test-circleci
+      - migration:
+          requires:
+            - "docker-build"
+      - deploy-k8s-cluster:
+          requires:
+            - "docker-build"
+      - app-deployment:
+          requires:
+            - "deploy-k8s-cluster"
+
 
